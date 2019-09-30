@@ -10,7 +10,13 @@ params:
 ---
 
 # Loading Libraries and Data
-Here we load some necessary libraries and the specified files. 
+Here we load some necessary libraries and the specified files.
+
+Template-file: `r params$filename_template`
+
+Params-file: `r params$filename_params`
+
+fitTable-file: `r params$filename_fitTable`
 
 ```{r message = FALSE, warning = FALSE}
 library(tidyverse)

@@ -21,5 +21,6 @@ render(reportTemplate,
         filename_template = opts$template_file,
         filename_params = opts$params_file,
         filename_fitTable = opts$fitTable_file),
-    output_file = opts$output_file
+    output_file = opts$output_file,
+    output_dir = dirname(opts$output_file)
 )
