@@ -32,7 +32,7 @@ template_str <- read_file(filename_template)
 r <- "^BRANCHES\\s*=\\s*\\[(.+)\\]\\s*EVENTS\\s*=\\s*\\[([\\S\\s]*)\\]"
 m <- str_match(template_str, r)
 branches_str <- m[1,2]
-events_str <- m[1,3]
+events_str <- m[1,3] %>% gsub("CONSTRAINTS.*","",.)
 branches <- str_split(branches_str, ",[\\s*]")[[1]]
 events <- str_squish(str_split(events_str, ";[\\s*]")[[1]])
 
