@@ -48,7 +48,7 @@ if(startsWith(first_line, "#")) {
 
 for (i in 1:nrow(paramsDat))
   events <- str_replace(events, str_c("<", paramsDat[[i,1]], ">"), toString(paramsDat[[i,2]]))
-summaryFitData <- read_tsv(filename_fitTable) %>%
+summaryFitData <- read_tsv(filename_fitTable, col_types = 'fddidd') %>%
   mutate(Populations=factor(Populations, level = unique(Populations)))
 ```
 
@@ -115,7 +115,11 @@ summaryFitData %>%
 And here is the relative deviation between model and fit:
 
 ```{r fit deviation plot}
+plot_range <- c(-100,100)
 ggplot(summaryFitData, aes(x=Populations, y=`relDev%`)) +
-  geom_bar(stat="identity") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  geom_col(fill="#F8766D") +
+  coord_cartesian(ylim=plot_range) +
+  scale_x_discrete() +
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), panel.grid.major.x=element_blank() ) 
 ```

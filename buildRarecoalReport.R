@@ -11,7 +11,7 @@ opts <- docopt(doc)
 print("running with Options:")
 print(opts)
 
-reportTemplate <- "~/dev/rarecoal-report/rarecoalModelFitReport.Rmd"
+reportTemplate <- "~/Software/rarecoal-report/rarecoalModelFitReport.Rmd"
 if(!file.exists(reportTemplate)) {
     stop("could not find report-template. Please modify the path to <reportTemplate> in this script to point to the template rarecoalModelFitReport.Rmd")
 }
