@@ -75,6 +75,7 @@ for (e in event_fields) {
     pop <- e[3]
     i <- which(pop == branches)
     tip_times[i] <- time
+    lines(c(i,i), c(tip_times[i], 0), lwd=2, lty=3, col="grey50")
   }
   if(e[1] %in% c("J", "K")) {
     time <- as.double(e[2]) * 40000 * 29
