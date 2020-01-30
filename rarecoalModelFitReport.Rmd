@@ -32,7 +32,7 @@ template_str <- read_file(filename_template)
 r <- "^BRANCHES\\s*=\\s*\\[(.+)\\]\\s*EVENTS\\s*=\\s*\\[([\\S\\s]*)\\]"
 m <- str_match(template_str, r)
 branches_str <- m[1,2]
-events_str <- m[1,3]
+events_str <- m[1,3] %>% gsub("CONSTRAINTS.*","",.)
 branches <- str_split(branches_str, ",[\\s*]")[[1]]
 events <- str_squish(str_split(events_str, ";[\\s*]")[[1]])
 
@@ -48,7 +48,7 @@ if(startsWith(first_line, "#")) {
 
 for (i in 1:nrow(paramsDat))
   events <- str_replace(events, str_c("<", paramsDat[[i,1]], ">"), toString(paramsDat[[i,2]]))
-summaryFitData <- read_tsv(filename_fitTable) %>%
+summaryFitData <- read_tsv(filename_fitTable, col_types = 'fddidd') %>%
   mutate(Populations=factor(Populations, level = unique(Populations)))
 ```
 
@@ -65,17 +65,25 @@ Here is a tree plot of the model. Times are indicated by y-coordinate, and admix
 ```{r tree plot}
 plot.new()
 n <- length(branches)
+tip_times <- rep(0, n)
 event_fields <- events %>% str_split("\\s")
 max_time <- (event_fields %>% map(function(x) as.double(x[2])) %>% reduce(max)) * 40000 * 29
 plot.window(c(1,n), c(-(max_time * 0.05),max_time*1.05))
 for (e in event_fields) {
+  if(paste(e[1],e[4]) == "F False") {
+    time <- as.double(e[2]) * 40000 * 29
+    pop <- e[3]
+    i <- which(pop == branches)
+    tip_times[i] <- time
+    lines(c(i,i), c(tip_times[i], 0), lwd=2, lty=3, col="grey50")
+  }
   if(e[1] %in% c("J", "K")) {
     time <- as.double(e[2]) * 40000 * 29
     to_pop <- e[3]
     from_pop <- e[4]
     to_i <- which(to_pop == branches)
     from_i <- which(from_pop == branches)
-    lines(c(to_i, to_i, from_i, from_i), c(0, time, time, 0), lwd=2)
+    lines(c(to_i, to_i, from_i, from_i), c(tip_times[to_i], time, time, tip_times[from_i]), lwd=2)
   }
   if(e[1] == "S") {
     time <- as.double(e[2]) * 40000 * 29
@@ -108,7 +116,11 @@ summaryFitData %>%
 And here is the relative deviation between model and fit:
 
 ```{r fit deviation plot}
+plot_range <- c(-100,100)
 ggplot(summaryFitData, aes(x=Populations, y=`relDev%`)) +
-  geom_bar(stat="identity") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  geom_col(fill="#F8766D") +
+  coord_cartesian(ylim=plot_range) +
+  scale_x_discrete() +
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), panel.grid.major.x=element_blank() ) 
 ```
